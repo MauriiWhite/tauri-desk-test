@@ -1,8 +1,8 @@
 name: 'publish'
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'app-v*'
 
 jobs:
   publish-tauri:
@@ -62,35 +62,24 @@ jobs:
       - name: Extract version
         id: vars
         run: echo "VERSION=${GITHUB_REF#refs/tags/app-v}" >> $GITHUB_OUTPUT
-
+          
       - name: Create GitHub release
         id: create_release
-        uses: tauri-apps/tauri-action@v0
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: ${{ github.ref_name }}
-          releaseName: 'App v${{ steps.vars.outputs.VERSION }}'
-          releaseBody: 'See the assets to download this version and install.'
-          releaseDraft: true
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ steps.vars.outputs.VERSION }}
+          draft: false
           prerelease: false
-
-      - name: Upload MSI installer to release
+          
+      - name: Upload installer MSI
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: src-tauri/target/release/bundle/msi/tauri-desk-test_0.1.0_x64_en-US.msi
-          asset_name: tauri-desk-test_0.1.0_x64_en-US.msi
+          asset_path: src-tauri/target/release/bundle/msi/tauri-desk-test_${{ steps.vars.outputs.VERSION }}_x64_en-US.msi
+          asset_name: tauri-desk-test_${{ steps.vars.outputs.VERSION }}_x64_en-US.msi
           asset_content_type: application/x-msi
-
-      - name: Upload NSIS installer to release
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: src-tauri/target/release/bundle/nsis/tauri-desk-test_${{ steps.vars.outputs.VERSION }}_x64-setup.exe
-          asset_name: tauri-desk-test_${{ steps.vars.outputs.VERSION }}_x64-setup.exe
-          asset_content_type: application/x-msdownload
