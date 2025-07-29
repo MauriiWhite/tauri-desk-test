@@ -24,6 +24,11 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
+          
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.2.18
 
       - name: Install app dependencies and build it
         run: |
