@@ -59,9 +59,11 @@ jobs:
             src-tauri/target/release/bundle/msi/*.msi
             src-tauri/target/release/bundle/nsis/*.exe
 
-      - name: Extract version
+      - name: Extract version from package.json
         id: vars
-        run: echo "VERSION=${GITHUB_REF#refs/tags/app-v}" >> $GITHUB_OUTPUT
+        run: |
+          VERSION=$(jq -r '.version' package.json)
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
           
       - name: Create GitHub release
         id: create_release
@@ -69,11 +71,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref_name }}
+          tag_name: ${{ steps.vars.outputs.VERSION }}
           release_name: Release ${{ steps.vars.outputs.VERSION }}
           draft: false
           prerelease: false
-          
+
       - name: Upload installer MSI
         uses: actions/upload-release-asset@v1
         env:
