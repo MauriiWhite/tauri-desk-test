@@ -6,19 +6,21 @@ on:
       - "v*.*.*"
 
 jobs:
-  build:
-    name: Build & Package
-    runs-on: windows-latest
-
+  publish-tauri:
     strategy:
       fail-fast: false
+      matrix:
+        platform: [windows-latest]
 
     permissions:
       contents: write
 
+    name: Build & Package
+    runs-on: ${{ matrix.platform }}
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup Node.js v22.17.1
         uses: actions/setup-node@v3
@@ -41,11 +43,6 @@ jobs:
           $signtoolPath = 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64'
           Write-Host "Using Signtool path: $signtoolPath"
           "##[add-path]$signtoolPath" | Out-File -FilePath $Env:GITHUB_PATH -Encoding utf8 -Append
-
-      - name: Verify Signtool
-        shell: pwsh
-        run: |
-          Get-Command signtool.exe
 
       - name: Install dependencies & build Tauri app
         shell: pwsh
@@ -73,7 +70,7 @@ jobs:
 
   release:
     name: Create GitHub Release
-    needs: build
+    needs: publish-tauri
     runs-on: windows-latest
     steps:
       - name: Checkout repository
