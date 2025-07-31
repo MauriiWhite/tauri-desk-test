@@ -62,16 +62,10 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-  upload-artifacts:
-    permissions:
-      contents: write
-
-    name: Upload Release Installer
-    needs: release
-    runs-on: windows-latest
-    steps:
       - name: Upload installer EXE
         uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: src-tauri/target/release/bundle/nsis/tauri-desk-test_${{ github.ref_name }}_x64-setup.exe
