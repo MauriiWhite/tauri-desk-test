@@ -15,17 +15,14 @@ jobs:
     permissions:
       contents: write
 
-    name: Build & Package
     runs-on: ${{ matrix.platform }}
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v2
 
       - name: Setup Node.js v22.17.1
         uses: actions/setup-node@v3
         with:
-          node-version: "22.17.1"
+          node-version: 22.17.1
 
       - name: Install Rust stable
         uses: actions-rs/toolchain@v1
@@ -37,26 +34,19 @@ jobs:
         with:
           bun-version: 1.2.18
 
-      - name: Add Signtool to PATH
-        shell: pwsh
-        run: |
-          $signtoolPath = 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64'
-          Write-Host "Using Signtool path: $signtoolPath"
-          "##[add-path]$signtoolPath" | Out-File -FilePath $Env:GITHUB_PATH -Encoding utf8 -Append
-
-      - name: Install dependencies & build Tauri app
-        shell: pwsh
+      - name: Install app dependencies and build it
         run: |
           bun install
           bun tauri build
 
       - name: Import Windows certificate
+        if: matrix.platform == 'windows-latest'
         shell: pwsh
         env:
           WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
           WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
         run: |
-          New-Item -ItemType directory -Path certificate
+          New-Item -ItemType Directory -Path certificate -Force
           Set-Content -Path certificate/tempCert.txt -Value $env:WINDOWS_CERTIFICATE
           certutil -decode certificate/tempCert.txt certificate/certificate.pfx
           Remove-Item -Path certificate/tempCert.txt
