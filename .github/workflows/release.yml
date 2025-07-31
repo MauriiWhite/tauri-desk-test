@@ -54,12 +54,19 @@ jobs:
           prerelease: false
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Extract version from package.json
+        id: vars
+        shell: pwsh
+        run: |
+          $ver = node -p "require('./package.json').version"
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "VERSION=$ver"
+
       - name: Upload installer EXE
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: src-tauri/target/release/bundle/nsis/tauri-desk-test_${{ github.ref_name }}_x64-setup.exe
-          asset_name: tauri-desk-test_${{ github.ref_name }}_x64-setup.exe
+          asset_path: src-tauri/target/release/bundle/nsis/tauri-desk-test_${{ steps.vars.outputs.VERSION }}_x64-setup.exe
+          asset_name: tauri-desk-test_${{ steps.vars.outputs.VERSION }}_x64-setup.exe
           asset_content_type: application/vnd.microsoft.portable-executable
