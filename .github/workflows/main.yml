@@ -82,6 +82,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: src-tauri/target/release/bundle/nsis/*.exe
+          asset_path: src-tauri/target/release/bundle/nsis/tauri-desk-test_${{ steps.vars.outputs.VERSION }}_x64_en-US.exe
           asset_name: tauri-desk-test_${{ steps.vars.outputs.VERSION }}_x64_en-US.exe
           asset_content_type: application/vnd.microsoft.portable-executable
