@@ -32,15 +32,6 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ],
-    "windows": {
-      "certificateThumbprint": "63645b520a20a919f02a6f559713dbbec87b35c9",
-      "digestAlgorithm": "sha256",
-      "timestampUrl": "http://timestamp.comodoca.com",
-      "webviewInstallMode": {
-        "silent": true,
-        "type": "downloadBootstrapper"
-      }
-    }
+    ]
   }
 }
