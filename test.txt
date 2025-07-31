@@ -1,0 +1,23 @@
+    // "windows": {
+    //   "certificateThumbprint": "63645b520a20a919f02a6f559713dbbec87b35c9",
+    //   "digestAlgorithm": "sha256",
+    //   "timestampUrl": "http://timestamp.comodoca.com",
+    //   "webviewInstallMode": {
+    //     "silent": true,
+    //     "type": "downloadBootstrapper"
+    //   }
+    // }
+
+
+      # - name: Import Windows certificate
+      #   if: matrix.platform == 'windows-latest'
+      #   shell: pwsh
+      #   env:
+      #     WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
+      #     WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+      #   run: |
+      #     New-Item -ItemType Directory -Path certificate -Force
+      #     Set-Content -Path certificate/tempCert.txt -Value $env:WINDOWS_CERTIFICATE
+      #     certutil -decode certificate/tempCert.txt certificate/certificate.pfx
+      #     Remove-Item -Path certificate/tempCert.txt
+      #     Import-PfxCertificate -FilePath certificate/certificate.pfx -CertStoreLocation Cert:\CurrentUser\My -Password (ConvertTo-SecureString -String $env:WINDOWS_CERTIFICATE_PASSWORD -Force -AsPlainText)
