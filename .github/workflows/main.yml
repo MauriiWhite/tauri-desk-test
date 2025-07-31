@@ -76,13 +76,14 @@ jobs:
           release_name: Release ${{ steps.vars.outputs.VERSION }}
           draft: false
           prerelease: false
-
-      - name: Upload installer MSI
+          
+      - name: Upload installer EXE
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: src-tauri/target/release/bundle/msi/tauri-desk-test_${{ steps.vars.outputs.VERSION }}_x64_en-US.msi
-          asset_name: tauri-desk-test_${{ steps.vars.outputs.VERSION }}_x64_en-US.msi
-          asset_content_type: application/x-msi
+          asset_path: src-tauri/target/release/bundle/nsis/tauri-desk-test_${{ steps.vars.outputs.VERSION }}_x64_en-US.exe
+          asset_name: tauri-desk-test_${{ steps.vars.outputs.VERSION }}_x64_en-US.exe
+          asset_content_type: application/vnd.microsoft.portable-executable
+
