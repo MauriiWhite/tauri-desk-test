@@ -35,12 +35,15 @@ jobs:
         with:
           bun-version: 1.2.18
 
-      - name: Add Signtool to PATH
+      - name: Add Signtool to PATH (PowerShell)
+        shell: pwsh
         run: |
-          echo "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64" >> $GITHUB_PATH
+          $signtool = 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64'
+          "##[add-path]$signtool" | Out-File -FilePath $Env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Verify Signtool
-        run: where signtool
+        shell: pwsh
+        run: signtool.exe /?
 
       - name: Install dependencies & build Tauri app
         shell: pwsh
