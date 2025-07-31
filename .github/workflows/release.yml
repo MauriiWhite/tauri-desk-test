@@ -35,18 +35,17 @@ jobs:
         with:
           bun-version: 1.2.18
 
-      - name: Add Signtool to PATH (PowerShell)
+      - name: Add Signtool to PATH
         shell: pwsh
         run: |
-          $kitRoot = 'C:\Program Files (x86)\Windows Kits\10\bin'
-          $latest = Get-ChildItem $kitRoot | Where-Object { $_.PSIsContainer } | Sort-Object Name -Descending | Select-Object -First 1
-          $signtoolPath = Join-Path $latest.FullName 'x64'
-          Write-Host "Signtool path: $signtoolPath"
+          $signtoolPath = 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64'
+          Write-Host "Using Signtool path: $signtoolPath"
           "##[add-path]$signtoolPath" | Out-File -FilePath $Env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Verify Signtool
         shell: pwsh
-        run: Get-Command signtool.exe
+        run: |
+          Get-Command signtool.exe
 
       - name: Install dependencies & build Tauri app
         shell: pwsh
