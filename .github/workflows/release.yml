@@ -47,22 +47,25 @@ jobs:
           path: src-tauri/target/release/bundle/nsis/*.exe
 
   release:
+    permissions:
+      contents: write
+
     name: Create GitHub Release
     needs: publish-tauri
     runs-on: windows-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
-      - id: create_release
-        name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: actions/checkout@v4
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          prerelease: ${{ contains(github.ref_name, '-rc') || contains(github.ref_name, '-beta') }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
   upload-artifacts:
+    permissions:
+      contents: write
+
     name: Upload Release Installer
     needs: release
     runs-on: windows-latest
