@@ -35,6 +35,13 @@ jobs:
         with:
           bun-version: 1.2.18
 
+      - name: Add Signtool to PATH
+        run: |
+          echo "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64" >> $GITHUB_PATH
+
+      - name: Verify Signtool
+        run: where signtool
+
       - name: Install dependencies & build Tauri app
         shell: pwsh
         run: |
