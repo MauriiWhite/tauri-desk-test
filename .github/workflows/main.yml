@@ -43,32 +43,25 @@ jobs:
           WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
           WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
         run: |
-          New-Item -ItemType Directory -Path certificate -Force
+          New-Item -ItemType directory -Path certificate
           Set-Content -Path certificate/tempCert.txt -Value $env:WINDOWS_CERTIFICATE
           certutil -decode certificate/tempCert.txt certificate/certificate.pfx
-          Remove-Item certificate/tempCert.txt
-          Import-PfxCertificate -FilePath certificate/certificate.pfx \
-            -CertStoreLocation Cert:\CurrentUser\My \
-            -Password (ConvertTo-SecureString $env:WINDOWS_CERTIFICATE_PASSWORD -AsPlainText -Force)
-
-      - name: Upload build artifacts
+          Remove-Item -path certificate -include tempCert.txt
+          Import-PfxCertificate -FilePath certificate/certificate.pfx -CertStoreLocation Cert:\CurrentUser\My -Password (ConvertTo-SecureString -String $env:WINDOWS_CERTIFICATE_PASSWORD -Force -AsPlainText)
+          
+      - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: tauri-build
           path: |
-            src-tauri/target/release/bundle/msi/*.msi
             src-tauri/target/release/bundle/nsis/*.exe
 
-      # <<--- Aquí corregimos la extracción de la versión
       - name: Extract version from package.json
         id: vars
-        shell: pwsh        # o elimina shell: pwsh y usa bash
+        shell: pwsh
         run: |
-          # PowerShell versión
           $ver = node -p "require('./package.json').version"
           Add-Content -Path $env:GITHUB_OUTPUT -Value "VERSION=$ver"
-          # Si prefieres bash, podrías comentar lo anterior y descomentar ésto:
-          # echo "VERSION=$(node -p \"require('./package.json').version\")" >> $GITHUB_OUTPUT
 
       - name: Create GitHub release
         id: create_release
@@ -80,13 +73,13 @@ jobs:
           release_name: Release ${{ steps.vars.outputs.VERSION }}
           draft: false
           prerelease: false
-
-      - name: Upload installer MSI
+          
+      - name: Upload installer EXE
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: src-tauri/target/release/bundle/msi/tauri-desk-test_${{ steps.vars.outputs.VERSION }}_x64_en-US.msi
-          asset_name: tauri-desk-test_${{ steps.vars.outputs.VERSION }}_x64_en-US.msi
-          asset_content_type: application/x-msi
+          asset_path: src-tauri/target/release/bundle/nsis/tauri-desk-test_${{ steps.vars.outputs.VERSION }}_x64-setup.exe
+          asset_name: tauri-desk-test_${{ steps.vars.outputs.VERSION }}_x64-setup.exe
+          asset_content_type: application/vnd.microsoft.portable-executable
